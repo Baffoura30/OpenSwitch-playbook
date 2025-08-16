@@ -2,10 +2,10 @@
 
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)  
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)  
-[![GitHub stars](https://img.shields.io/github/stars/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/stargazers)  
-[![GitHub forks](https://img.shields.io/github/forks/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/network/members)  
+[![GitHub stars](https://img.shields.io/github/stars/Baffoura30/openswitch-playbook.svg?style=social)](https://github.com/Baffoura30/openswitch-playbook/stargazers)  
+[![GitHub forks](https://img.shields.io/github/forks/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/openswitch-playbook/network/members)  
 
-**Version 1.1 – Interactive IT Edition**  
+**Version 1.0 – Techie Edition**  
 Author: **Baffour Dokyi Ampaw**  
 License: CC BY-SA 4.0
 
@@ -44,14 +44,14 @@ Released under **Creative Commons Attribution-ShareAlike 4.0** (CC BY-SA 4.0).
 You may use, share, and adapt with attribution and the same license.
 
 ## GitHub
-[Repo](https://github.com/Baffoura30/open-switch-playbook/)
+[Repo](https://github.com/Baffoura30/openswitch-playbook/)
 
 ## Contributors  
 
 Thanks to everyone improving Open Switch Playbook.  
 
-<a href="https://github.com/Baffoura30/open-switch-playbook/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Baffoura30/open-switch-playbook" />
+<a href="https://github.com/Baffoura30/openswitch-playbook/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Baffoura30/openswitch-playbook" />
 </a>  
 
 Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
