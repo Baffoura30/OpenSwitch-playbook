@@ -2,6 +2,12 @@
 
 Thank you for helping improve the Switch Troubleshooting Playbook!
 
+<a href="https://github.com/YOUR-USERNAME/open-switch-playbook/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=YOUR-USERNAME/open-switch-playbook" />
+</a>
+
+Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
+
 ## Ways to contribute
 - Fix typos, improve clarity
 - Add new troubleshooting flows (e.g., STP, PoE, Stacking)
