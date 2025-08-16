@@ -14,7 +14,7 @@ License: CC BY-SA 4.0
 An open-source, vendor-agnostic playbook for troubleshooting network switches, designed for network technicians and engineers. This project is a **living document**, evolving through community contributions to provide practical, field-ready guidance.
 
 ## Contents
-- Interactive HTML playbook (`playbook.html`)
+- Interactive HTML playbook (`OpenSwitch-Playbook.html`)
 - Reference materials (baud rates, tools, key commands)
 - Contribution guidelines (`CONTRIBUTING.md`)
 
@@ -49,7 +49,7 @@ The **Open Switch Playbook v1.0** is a browser-based HTML tool offering:
    - Print the HTML page or save as PDF for a portable reference.
 
 ## Project Structure
-- `playbook.html`: The main interactive HTML playbook.
+- `OpenSwitch-Playbook.html`: The main interactive HTML playbook.
 - `CONTRIBUTING.md`: Guidelines for contributing to the project.
 - `LICENSE`: Creative Commons Attribution-ShareAlike 4.0 license text.
 - `.gitignore`: Excludes temporary and system files to keep the repository clean.
