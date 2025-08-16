@@ -20,6 +20,13 @@ Designed as a **living document** that evolves with community contributions.
 - Baud rate reference
 - Changelog and contribution guidelines
 
+## What’s Inside the Playbook  
+
+The **Open Switch Playbook** provides step-by-step procedures, diagrams, and checklists to help network technicians and engineers:  
+- Diagnose and resolve common switch issues quickly  
+- Work **offline** in the field, without relying on internet access  
+- Refresh knowledge on concepts and commands they might have forgotten  
+
 ## How to use
 - Open the Word playbook under `playbook/`
 - Print the **Quick Reference Diagrams** (Appendix B) for field use
@@ -38,3 +45,13 @@ You may use, share, and adapt with attribution and the same license.
 
 ## GitHub
 [Repo](https://github.com/Baffoura30/open-switch-playbook/)
+
+## Contributors  
+
+Thanks to everyone improving Open Switch Playbook.  
+
+<a href="https://github.com/Baffoura30/open-switch-playbook/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Baffoura30/open-switch-playbook" />
+</a>  
+
+Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
