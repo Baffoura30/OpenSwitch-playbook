@@ -2,7 +2,7 @@
 
 Thank you for helping improve the Switch Troubleshooting Playbook!
 
-<a href="https://github.com/YOUR-USERNAME/open-switch-playbook/graphs/contributors">
+<a href="https://github.com/Baffoura30/open-switch-playbook/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=YOUR-USERNAME/open-switch-playbook" />
 </a>
 
