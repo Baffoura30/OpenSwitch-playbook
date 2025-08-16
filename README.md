@@ -5,7 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/stargazers)  
 [![GitHub forks](https://img.shields.io/github/forks/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/network/members)  
 
-**Version 2.1 – Interactive IT Edition**  
+**Version 1.1 – Interactive IT Edition**  
 Author: **Baffour Dokyi Ampaw**  
 License: CC BY-SA 4.0
 
