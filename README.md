@@ -37,7 +37,7 @@ The **Open Switch Playbook v1.0** is a browser-based HTML tool offering:
 
 ## How to Use
 1. **Open the Playbook**:
-   - Download `playbook.html` from the repository.
+   - Download `openswitch-playbook.html` from the repository.
    - Open it in any modern browser (e.g., Chrome, Firefox) using `file://` (no internet required).
 2. **Navigate**:
    - Use the triage flowchart for initial steps.
@@ -64,8 +64,8 @@ To contribute:
 1. Fork the repository.
 2. Clone your fork and create a new branch:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/open-switch-playbook.git
-   cd open-switch-playbook
+   git clone https://github.com/YOUR_USERNAME/openswitch-playbook.git
+   cd openswitch-playbook
    git checkout -b your-branch-name
    ```
 3. Make changes, commit, and push:
