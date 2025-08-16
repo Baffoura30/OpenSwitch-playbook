@@ -2,12 +2,6 @@
 
 Thank you for helping improve the Switch Troubleshooting Playbook!
 
-<a href="https://github.com/Baffoura30/open-switch-playbook/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=YOUR-USERNAME/open-switch-playbook" />
-</a>
-
-Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
-
 ## Ways to contribute
 - Fix typos, improve clarity
 - Add new troubleshooting flows (e.g., STP, PoE, Stacking)
@@ -28,3 +22,13 @@ Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
 ## Original Author
 **Baffour Dokyi Ampaw**
 
+
+## Contributors  
+
+Thanks to everyone improving Open Switch Playbook.  
+
+<a href="https://github.com/Baffoura30/open-switch-playbook/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Baffoura30/open-switch-playbook" />
+</a>  
+
+Want to be listed here? See the [Contributing Guide](CONTRIBUTING.md).
