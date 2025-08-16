@@ -32,4 +32,4 @@ Released under **Creative Commons Attribution-ShareAlike 4.0** (CC BY-SA 4.0).
 You may use, share, and adapt with attribution and the same license.
 
 ## GitHub
-Placeholder: (https://github.com/Baffoura30/open-switch-playbook/)
+[Repo](https://github.com/Baffoura30/open-switch-playbook/)
