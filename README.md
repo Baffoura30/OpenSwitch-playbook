@@ -2,8 +2,8 @@
 
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)  
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)  
-[![GitHub stars](https://img.shields.io/github/stars/YOUR-USERNAME/open-switch-playbook.svg?style=social)](https://github.com/YOUR-USERNAME/open-switch-playbook/stargazers)  
-[![GitHub forks](https://img.shields.io/github/forks/YOUR-USERNAME/open-switch-playbook.svg?style=social)](https://github.com/YOUR-USERNAME/open-switch-playbook/network/members)  
+[![GitHub stars](https://img.shields.io/github/stars/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/stargazers)  
+[![GitHub forks](https://img.shields.io/github/forks/Baffoura30/open-switch-playbook.svg?style=social)](https://github.com/Baffoura30/open-switch-playbook/network/members)  
 
 **Version 2.1 – Interactive IT Edition**  
 Author: **Baffour Dokyi Ampaw**  
