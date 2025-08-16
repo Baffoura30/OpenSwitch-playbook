@@ -1,13 +1,35 @@
-# open-switch-playbook
-An open-source, vendor-agnostic guide for practical switch troubleshooting.
-Community-maintained and designed as a living document that grows with contributions from IT professionals worldwide.
+# Switch Troubleshooting Playbook
 
-The playbook provides step-by-step procedures, diagrams, and checklists to help network technicians and engineers:
+**Version 2.1 – Interactive IT Edition**  
+Author: **Baffour Dokyi Ampaw**  
+License: CC BY-SA 4.0  
 
-Diagnose and resolve common switch issues quickly
+---
 
-Work offline in the field, without relying on internet access
+An open-source, vendor-agnostic playbook for troubleshooting network switches.  
+Designed as a **living document** that evolves with community contributions.
 
-Refresh knowledge on concepts and commands they might have forgotten
+## Contents
+- Playbook (Word)
+- Diagrams (PNG)
+- Baud rate reference
+- Changelog and contribution guidelines
 
-Goal: To be a practical, always-evolving reference that any professional can update, improve, and share.
+## How to use
+- Open the Word playbook under `playbook/`
+- Print the **Quick Reference Diagrams** (Appendix B) for field use
+
+## Contributing
+We welcome PRs for:
+- New troubleshooting flows (STP, PoE, Stacking, QoS, Multicast)
+- Additional vendor-agnostic CLI examples
+- Real-world fault scenarios and fixes
+
+See `CONTRIBUTING.md` for guidelines.
+
+## License
+Released under **Creative Commons Attribution-ShareAlike 4.0** (CC BY-SA 4.0).  
+You may use, share, and adapt with attribution and the same license.
+
+## GitHub
+Placeholder: https://github.com/YourRepoName
