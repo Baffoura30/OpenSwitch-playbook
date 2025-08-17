@@ -12,22 +12,19 @@
                 var firstSheetName = workbook.SheetNames[0];
                 var worksheet = workbook.Sheets[firstSheetName];
 
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' })
                 var filteredData = jsonData.filter(row => row.some(filledCell));
 
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                 var headerRowIndex = filteredData.findIndex((row, index) =>
                   row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
-                // Fallback
+              
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
                   headerRowIndex = 0;
                 }
 
                 // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); 
                 csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                 return csv;
             } catch (e) {
@@ -83,7 +80,7 @@
         .modal-content { background-color: var(--card-bg-light); padding: 1.5rem; border-radius: 0.5rem; max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; }
         .toast { position: fixed; bottom: 1rem; right: 1rem; background-color: var(--success-bg); color: var(--success-text); padding: 0.75rem 1.5rem; border-radius: 0.25rem; z-index: 100; opacity: 0; transition: opacity 0.3s; }
         .toast.show { opacity: 1; }
-        /* Print-specific styles */
+        
         @media print {
             body { background: white; color: black; font-size: 12pt; }
             .modal-overlay, .modal-content, .copy-btn, .vendor-tab, .flowchart-arrow, button, input, textarea { display: none; }
@@ -95,7 +92,7 @@
             .print-section ul { list-style-type: disc; margin-left: 0.5in; }
             .print-section p { margin: 0.25in 0; }
         }
-        /* Tailwind-equivalent classes */
+        
         .max-w-4xl { max-width: 64rem; }
         .mx-auto { margin-left: auto; margin-right: auto; }
         .flex { display: flex; }
@@ -218,7 +215,7 @@
         </details>
         <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">2. Symptom-Based Troubleshooting</h2>
         <div id="symptoms-container" class="space-y-4">
-            <!-- Populated by script -->
+            
         </div>
         <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">3. Reference Materials</h2>
         <div class="space-y-4">
@@ -278,7 +275,8 @@
             <summary>Version History</summary>
             <div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700">
                 <ul class="list-disc list-inside space-y-2">
-                    <li><b>v1.1 (August 16, 2025):</b> Initial release with basic triage and reference materials. Made offline-compatible, improved accessibility with ARIA labels and cue text, enhanced export to all symptoms, persisted vendor tabs, added key indicators to commands, vendor notes to baud rates, flowchart labels.</li>
+                    <li><b>v1.1 (August 16, 2025):</b> Initial release with basic triage and reference materials. Made offline-compatible, improved accessibility with ARIA labels and cue text, 
+                            enhanced export to all symptoms, persisted vendor tabs, added key indicators to commands, vendor notes to baud rates, flowchart labels.</li>
                 </ul>
             </div>
         </details>
