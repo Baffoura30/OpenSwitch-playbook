@@ -1,40 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' })
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-              
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); 
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -42,141 +6,141 @@
     <title>OpenSwitch Playbook v1.1</title>
     <style>
         :root {
-            --bg-light: #f9fafb; --text-light: #1f2937; --bg-dark: #111827; --text-dark: #f3f4f6;
-            --accent-color: #3b82f6; --border-light: #e5e7eb; --border-dark: #374151;
-            --card-bg-light: #ffffff; --card-bg-dark: #1f2937; --header-bg-light: #f3f4f6;
-            --header-bg-dark: #374151; --header-text-light: #374151; --header-text-dark: #d1d5db;
-            --code-bg-light: #e5e7eb; --code-text-light: #111827;
-            --success-bg: #10b981; --success-text: #ffffff;
-        }
-        .dark {
-            --bg-light: #111827; --text-light: #f3f4f6; --border-light: #374151;
-            --card-bg-light: #1f2937; --header-bg-light: #374151; --header-text-light: #d1d5db;
-            --code-bg-light: #4b5563; --code-text-light: #f9fafb;
-        }
-        body { background-color: var(--bg-light); color: var(--text-light); font-family: Arial, sans-serif; padding: 1rem; }
-        @media (min-width: 640px) { body { padding: 1.5rem; } }
-        @media (min-width: 1024px) { body { padding: 2rem; } }
-        .card { background-color: var(--card-bg-light); }
-        .dark input[type="text"], .dark textarea { color: var(--text-dark); }
-        thead { background-color: var(--header-bg-light); color: var(--header-text-light); }
-        code { background-color: var(--code-bg-light); color: var(--code-text-light); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; }
-        details summary { cursor: pointer; font-weight: 600; padding: 0.75rem 1rem; background-color: var(--card-bg-light); border: 1px solid var(--border-light); border-radius: 0.5rem; transition: background-color 0.2s; }
-        details[open] > summary { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .copy-btn { background-color: #4b5563; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; margin-left: 8px; transition: background-color 0.2s; }
-        .copy-btn:hover { background-color: #6b7280; }
-        .copied-feedback { font-size: 0.75rem; color: var(--accent-color); margin-left: 8px; opacity: 0; transition: opacity 0.3s; }
-        .cue { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
-        .cue-icon { margin-right: 0.5rem; margin-top: 0.25rem; flex-shrink: 0; }
-        .hidden-by-search { display: none; }
-        .flowchart-step { background-color: var(--card-bg-light); border: 1px solid var(--border-light); padding: 0.75rem; border-radius: 0.5rem; text-align: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
-        .flowchart-arrow { display: flex; justify-content: center; align-items: center; height: 2rem; }
-        .vendor-tab { padding: 0.25rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; background-color: #e5e7eb; color: #374151; }
-        .dark .vendor-tab { background-color: #374151; color: #d1d5db; }
-        .vendor-tab.active { background-color: var(--accent-color); color: white; font-weight: 600; }
-        .vendor-content { display: none; }
-        .vendor-content.active { display: block; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
-        .modal-content { background-color: var(--card-bg-light); padding: 1.5rem; border-radius: 0.5rem; max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; }
-        .toast { position: fixed; bottom: 1rem; right: 1rem; background-color: var(--success-bg); color: var(--success-text); padding: 0.75rem 1.5rem; border-radius: 0.25rem; z-index: 100; opacity: 0; transition: opacity 0.3s; }
-        .toast.show { opacity: 1; }
-        
-        @media print {
-            body { background: white; color: black; font-size: 12pt; }
-            .modal-overlay, .modal-content, .copy-btn, .vendor-tab, .flowchart-arrow, button, input, textarea { display: none; }
-            #print-report { display: block; }
-            h1, h2, h3 { color: black; font-family: Arial, sans-serif; }
-            pre { white-space: pre-wrap; font-family: Arial, sans-serif; font-size: 12pt; }
-            .print-section { page-break-before: auto; margin-bottom: 1in; }
-            .print-section h3 { font-size: 14pt; margin-bottom: 0.5in; }
-            .print-section ul { list-style-type: disc; margin-left: 0.5in; }
-            .print-section p { margin: 0.25in 0; }
-        }
-        
-        .max-w-4xl { max-width: 64rem; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .flex { display: flex; }
-        .justify-between { justify-content: space-between; }
-        .items-center { align-items: center; }
-        .mb-6 { margin-bottom: 1.5rem; }
-        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-        .sm\:text-3xl { /* media sm */ }
-        @media (min-width: 640px) { .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; } }
-        .font-bold { font-weight: 700; }
-        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .text-gray-500 { color: rgb(107 114 128); }
-        .dark\:text-gray-400 { } .dark .dark\:text-gray-400 { color: rgb(156 163 175); }
-        .space-x-2 > * + * { margin-left: 0.5rem; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .font-medium { font-weight: 500; }
-        .text-white { color: rgb(255 255 255); }
-        .bg-green-600 { background-color: rgb(22 163 74); }
-        .rounded-md { border-radius: 0.375rem; }
-        .hover\:bg-green-700:hover { background-color: rgb(21 128 61); }
-        .p-2 { padding: 0.5rem; }
-        .bg-gray-200 { background-color: rgb(229 231 235); }
-        .dark\:bg-gray-700 { } .dark .dark\:bg-gray-700 { background-color: rgb(55 65 81); }
-        .h-6 { height: 1.5rem; }
-        .w-6 { width: 1.5rem; }
-        .dark\:hidden { } .dark .dark\:hidden { display: none; }
-        .hidden { display: none; }
-        .dark\:block { } .dark .dark\:block { display: block; }
-        .w-full { width: 100%; }
-        .border { border-width: 1px; border-style: solid; }
-        .bg-white { background-color: rgb(255 255 255); }
-        .dark\:bg-gray-800 { } .dark .dark\:bg-gray-800 { background-color: rgb(31 41 55); }
-        .border-gray-300 { border-color: rgb(209 213 219); }
-        .dark\:border-gray-600 { } .dark .dark\:border-gray-600 { border-color: rgb(75 85 99); }
-        .placeholder-gray-500::placeholder { color: rgb(107 114 128); }
-        .dark\:placeholder-gray-400::placeholder { color: rgb(156 163 175); }
-        .focus\:outline-none:focus { outline: none; }
-        .focus\:ring-2:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); }
-        .focus\:ring-blue-500:focus { --tw-ring-color: rgb(59 130 246); }
-        .grid { display: grid; }
-        .gap-4 { gap: 1rem; }
-        .md\:grid-cols-2 { } @media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        .space-y-2 > * + * { margin-top: 0.5rem; }
-        .list-disc { list-style-type: disc; }
-        .list-inside { list-style-position: inside; }
-        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .mt-8 { margin-top: 2rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .pb-2 { padding-bottom: 0.5rem; }
-        .border-b { border-bottom-width: 1px; border-bottom-style: solid; }
-        .border-gray-200 { border-color: rgb(229 231 235); }
-        .dark\:border-gray-700 { } .dark .dark\:border-gray-700 { border-color: rgb(55 65 81); }
-        .space-y-4 { } .space-y-4 > * + * { margin-top: 1rem; }
-        .text-left { text-align: left; }
-        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .border-t-0 { border-top-width: 0; }
-        .rounded-b-md { border-bottom-left-radius: 0.375rem; border-bottom-right-radius: 0.375rem; }
-        .align-top { vertical-align: top; }
-        .h-4 { height: 1rem; }
-        .w-4 { width: 1rem; }
-        .rounded { border-radius: 0.25rem; }
-        .text-blue-600 { color: rgb(37 99 235); }
-        .focus\:ring-blue-500:focus { --tw-ring-color: rgb(59 130 246); }
-        .mt-4 { margin-top: 1rem; }
-        .block { display: block; }
-        .mb-1 { margin-bottom: 0.25rem; }
-        .text-blue-600 { color: rgb(37 99 235); }
-        .dark\:text-blue-400 { } .dark .dark\:text-blue-400 { color: rgb(96 165 250); }
-        .font-semibold { font-weight: 600; }
-        .bg-gray-100 { background-color: rgb(243 244 246); }
-        .dark\:bg-gray-800 { } .dark .dark\:bg-gray-800 { background-color: rgb(31 41 55); }
-        .whitespace-pre-wrap { white-space: pre-wrap; }
-        .bg-blue-600 { background-color: rgb(37 99 235); }
-        .hover\:bg-blue-700:hover { background-color: rgb(29 78 216); }
-        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-        .text-gray-500 { color: rgb(107 114 128); }
-        .hover\:text-gray-800:hover { color: rgb(31 41 55); }
-        .dark\:hover\:text-gray-200 { } .dark .dark\:hover\:text-gray-200:hover { color: rgb(229 231 235); }
+    --bg-light: #f9fafb; --text-light: #1f2937; --bg-dark: #111827; --text-dark: #f3f4f6;
+    --accent-color: #3b82f6; --border-light: #e5e7eb; --border-dark: #374151;
+    --card-bg-light: #ffffff; --card-bg-dark: #1f2937; --header-bg-light: #f3f4f6;
+    --header-bg-dark: #374151; --header-text-light: #374151; --header-text-dark: #d1d5db;
+    --code-bg-light: #e5e7eb; --code-text-light: #111827;
+    --success-bg: #10b981; --success-text: #ffffff;
+}
+.dark {
+    --bg-light: #111827; --text-light: #f3f4f6; --border-light: #374151;
+    --card-bg-light: #1f2937; --header-bg-light: #374151; --header-text-light: #d1d5db;
+    --code-bg-light: #4b5563; --code-text-light: #f9fafb;
+}
+body { background-color: var(--bg-light); color: var(--text-light); font-family: Arial, sans-serif; padding: 1rem; }
+@media (min-width: 640px) { body { padding: 1.5rem; } }
+@media (min-width: 1024px) { body { padding: 2rem; } }
+.card { background-color: var(--card-bg-light); }
+.dark input[type="text"], .dark textarea { color: var(--text-dark); }
+thead { background-color: var(--header-bg-light); color: var(--header-text-light); }
+code { background-color: var(--code-bg-light); color: var(--code-text-light); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; }
+details summary { cursor: pointer; font-weight: 600; padding: 0.75rem 1rem; background-color: var(--card-bg-light); border: 1px solid var(--border-light); border-radius: 0.5rem; transition: background-color 0.2s; }
+details[open] > summary { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+.copy-btn { background-color: #4b5563; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; margin-left: 8px; transition: background-color 0.2s; }
+.copy-btn:hover { background-color: #6b7280; }
+.copied-feedback { font-size: 0.75rem; color: var(--accent-color); margin-left: 8px; opacity: 0; transition: opacity 0.3s; }
+.cue { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
+.cue-icon { margin-right: 0.5rem; margin-top: 0.25rem; flex-shrink: 0; }
+.hidden-by-search { display: none; }
+.flowchart-step { background-color: var(--card-bg-light); border: 1px solid var(--border-light); padding: 0.75rem; border-radius: 0.5rem; text-align: center; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+.flowchart-arrow { display: flex; justify-content: center; align-items: center; height: 2rem; }
+.vendor-tab { padding: 0.25rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; background-color: #e5e7eb; color: #374151; }
+.dark .vendor-tab { background-color: #374151; color: #d1d5db; }
+.vendor-tab.active { background-color: var(--accent-color); color: white; font-weight: 600; }
+.vendor-content { display: none; }
+.vendor-content.active { display: block; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.modal-content { background-color: var(--card-bg-light); padding: 1.5rem; border-radius: 0.5rem; max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; }
+.toast { position: fixed; bottom: 1rem; right: 1rem; background-color: var(--success-bg); color: var(--success-text); padding: 0.75rem 1.5rem; border-radius: 0.25rem; z-index: 100; opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+
+@media print {
+    body { background: white; color: black; font-size: 12pt; }
+    .modal-overlay, .modal-content, .copy-btn, .vendor-tab, .flowchart-arrow, button, input, textarea { display: none; }
+    #print-report { display: block; }
+    h1, h2, h3 { color: black; font-family: Arial, sans-serif; }
+    pre { white-space: pre-wrap; font-family: Arial, sans-serif; font-size: 12pt; }
+    .print-section { page-break-before: auto; margin-bottom: 1in; }
+    .print-section h3 { font-size: 14pt; margin-bottom: 0.5in; }
+    .print-section ul { list-style-type: disc; margin-left: 0.5in; }
+    .print-section p { margin: 0.25in 0; }
+}
+
+.max-w-4xl { max-width: 64rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.mb-6 { margin-bottom: 1.5rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.sm\:text-3xl { /* media sm */ }
+@media (min-width: 640px) { .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; } }
+.font-bold { font-weight: 700; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-gray-500 { color: rgb(107 114 128); }
+.dark\:text-gray-400 { } .dark .dark\:text-gray-400 { color: rgb(156 163 175); }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.font-medium { font-weight: 500; }
+.text-white { color: rgb(255 255 255); }
+.bg-green-600 { background-color: rgb(22 163 74); }
+.rounded-md { border-radius: 0.375rem; }
+.hover\:bg-green-700:hover { background-color: rgb(21 128 61); }
+.p-2 { padding: 0.5rem; }
+.bg-gray-200 { background-color: rgb(229 231 235); }
+.dark\:bg-gray-700 { } .dark .dark\:bg-gray-700 { background-color: rgb(55 65 81); }
+.h-6 { height: 1.5rem; }
+.w-6 { width: 1.5rem; }
+.dark\:hidden { } .dark .dark\:hidden { display: none; }
+.hidden { display: none; }
+.dark\:block { } .dark .dark\:block { display: block; }
+.w-full { width: 100%; }
+.border { border-width: 1px; border-style: solid; }
+.bg-white { background-color: rgb(255 255 255); }
+.dark\:bg-gray-800 { } .dark .dark\:bg-gray-800 { background-color: rgb(31 41 55); }
+.border-gray-300 { border-color: rgb(209 213 219); }
+.dark\:border-gray-600 { } .dark .dark\:border-gray-600 { border-color: rgb(75 85 99); }
+.placeholder-gray-500::placeholder { color: rgb(107 114 128); }
+.dark\:placeholder-gray-400::placeholder { color: rgb(156 163 175); }
+.focus\:outline-none:focus { outline: none; }
+.focus\:ring-2:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); }
+.focus\:ring-blue-500:focus { --tw-ring-color: rgb(59 130 246); }
+.grid { display: grid; }
+.gap-4 { gap: 1rem; }
+.md\:grid-cols-2 { } @media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.list-disc { list-style-type: disc; }
+.list-inside { list-style-position: inside; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.mt-8 { margin-top: 2rem; }
+.mb-4 { margin-bottom: 1rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; }
+.border-gray-200 { border-color: rgb(229 231 235); }
+.dark\:border-gray-700 { } .dark .dark\:border-gray-700 { border-color: rgb(55 65 81); }
+.space-y-4 { } .space-y-4 > * + * { margin-top: 1rem; }
+.text-left { text-align: left; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.border-t-0 { border-top-width: 0; }
+.rounded-b-md { border-bottom-left-radius: 0.375rem; border-bottom-right-radius: 0.375rem; }
+.align-top { vertical-align: top; }
+.h-4 { height: 1rem; }
+.w-4 { width: 1rem; }
+.rounded { border-radius: 0.25rem; }
+.text-blue-600 { color: rgb(37 99 235); }
+.focus\:ring-blue-500:focus { --tw-ring-color: rgb(59 130 246); }
+.mt-4 { margin-top: 1rem; }
+.block { display: block; }
+.mb-1 { margin-bottom: 0.25rem; }
+.text-blue-600 { color: rgb(37 99 235); }
+.dark\:text-blue-400 { } .dark .dark\:text-blue-400 { color: rgb(96 165 250); }
+.font-semibold { font-weight: 600; }
+.bg-gray-100 { background-color: rgb(243 244 246); }
+.dark\:bg-gray-800 { } .dark .dark\:bg-gray-800 { background-color: rgb(31 41 55); }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+.bg-blue-600 { background-color: rgb(37 99 235); }
+.hover\:bg-blue-700:hover { background-color: rgb(29 78 216); }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-gray-500 { color: rgb(107 114 128); }
+.hover\:text-gray-800:hover { color: rgb(31 41 55); }
+.dark\:hover\:text-gray-200 { } .dark .dark\:hover\:text-gray-200:hover { color: rgb(229 231 235); }
+
     </style>
 </head>
 <body>
     <div class="max-w-4xl mx-auto">
-        <!-- Header -->
         <header class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-bold">OpenSwitch Playbook v1.1</h1>
@@ -215,11 +179,10 @@
         </details>
         <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">2. Symptom-Based Troubleshooting</h2>
         <div id="symptoms-container" class="space-y-4">
-            
-        </div>
+            </div>
         <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">3. Reference Materials</h2>
         <div class="space-y-4">
-            <details class="troubleshooting-section"><summary>Appendix A: Recommended Tools</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700"><ul class="list-disc list-inside space-y-2"><li><b>Physical:</b> Cable tester, loopback plugs, console cable kit, spare patch cables, known-good PoE device.</li><li><b>Software:</b> PuTTY, TFTP server, Wireshark.</li></ul></div></details>
+            <details class="troubleshooting-section"><summary>Appendix A: Recommended Tools</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700"><ul class="list-disc list-inside space-y-2"><li><b>Physical:</b> Cable tester, loopback plugs, console cable kit, spare patch cables, known-good PoE device.</li><li><b>Software:</b> PuTTY, TFTP server, Wireshark.</li></ul></div></deta<\ctrl63>
             <details class="troubleshooting-section"><summary>Appendix B: Standard Baud Rates</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700" id="baud-rate-table-container"></div></details>
             <details class="troubleshooting-section"><summary>Appendix C: Regex Cheatsheet</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700" id="regex-table-container"></div></details>
             <details class="troubleshooting-section"><summary>Appendix D: Key Vendor-Neutral Commands</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700">
@@ -281,7 +244,6 @@
             </div>
         </details>
     </div>
-    <!-- Export Modal -->
     <div id="export-modal" class="modal-overlay hidden">
         <div class="modal-content card">
             <div class="flex justify-between items-center mb-4">
@@ -296,202 +258,240 @@
             </div>
         </div>
     </div>
-    <!-- Toast Notification -->
     <div id="toast" class="toast">Text copied to clipboard!</div>
-    <!-- Hidden Print Content -->
     <div id="print-report" class="hidden"></div>
-<script>
-    // --- DATA ---
-    const symptoms = [
-        {
-            id: "symptom-gibberish",
-            title: "Symptom: Gibberish or Garbled Console Output",
-            steps: [
-                { id: "gibberish-1", do: "Identify the Symptom", how: { generic: "You see random characters like `▒▒▒`." }, means: [{ cue: "🔴 (Critical)", text: "This is a classic baud rate mismatch." }] },
-                { id: "gibberish-2", do: "Change the Baud Rate", how: { generic: "In your terminal, change 'Speed (baud)' to <b>9600</b>, then <b>115200</b>." }, means: [{ cue: " ", text: "Cycle through rates in Appendix B." }] },
-                { id: "gibberish-3", do: "Verify Other Serial Settings", how: { generic: "Confirm: Data bits: 8, Stop bits: 1, Parity: None." }, means: [{ cue: " ", text: "Incorrect settings can also cause issues." }] }
-            ]
-        },
-        {
-            id: "symptom-single-user",
-            title: "Symptom: No Connectivity (Single User/Device)",
-            steps: [
-                { id: "single-1", do: "Check Physical Layer", how: { generic: "Visually inspect cable and link lights." }, means: [{ cue: "🟢 (OK)", text: "<b>Solid Green Light:</b> Link is up." }, { cue: "🔴 (Critical)", text: "<b>No Light/Amber Light:</b> Link is down. <b>Next Step:</b> Try a different port and a known-good cable." }] },
-                { id: "single-2", do: "Verify Port Status", how: { cisco_ios: "<code>show interfaces status | include [port]</code>", juniper_junos: "<code>show interfaces [port] terse</code>", arista_eos: "<code>show interface status</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Status 'connected':</b> Port is active." }, { cue: "🟡 (Investigate)", text: "<b>Status 'err-disabled':</b> Port was shut down by a security feature. <b>Next Step:</b> Investigate the cause using `show port-security`." }] },
-                { id: "single-3", do: "Check VLAN Assignment", how: { cisco_ios: "<code>show vlan brief | include [port]</code>", juniper_junos: "<code>show vlans | match [port]</code>", arista_eos: "<code>show vlan | include [port]</code>" }, means: [{ cue: "🟢 (OK)", text: "Port is in the correct VLAN." }, { cue: "🔴 (Critical)", text: "Port is in the wrong VLAN. <b>Next Step:</b> Move the port to the correct VLAN." }] },
-            ]
-        },
-        {
-            id: "symptom-subnet",
-            title: "Symptom: No Connectivity (Entire Subnet/VLAN)",
-            steps: [
-                { id: "subnet-1", do: "Check the Gateway/SVI", how: { cisco_ios: "<code>show ip interface brief</code>", juniper_junos: "<code>show interfaces terse | match vlan</code>", arista_eos: "<code>show ip interface brief</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Interface is 'up/up':</b> Gateway is active." }, { cue: "🟡 (Investigate)", text: "<b>Interface is 'down' or 'admin down':</b> The VLAN interface is disabled or has no active ports in it." }] },
-                { id: "subnet-2", do: "Verify Uplink/Trunk Status", how: { cisco_ios: "<code>show interface trunk</code>", juniper_junos: "<code>show interfaces trunk</code>", arista_eos: "<code>show interfaces trunk</code>" }, means: [{ cue: "🟢 (OK)", text: "Trunk is up and the VLAN is allowed." }, { cue: "🔴 (Critical)", text: "VLAN is not in the 'allowed' list. <b>Next Step:</b> Add the VLAN to the trunk's allowed list on both ends." }] },
-                { id: "subnet-3", do: "Check Spanning Tree (STP)", how: { cisco_ios: "<code>show spanning-tree vlan [id]</code>", juniper_junos: "<code>show spanning-tree bridge</code>", arista_eos: "<code>show spanning-tree vlan [id]</code>" }, means: [{ cue: "🟢 (OK)", text: "Port is 'Forwarding' (FWD)." }, { cue: "🔴 (Critical)", text: "Port is 'Blocking' (BLK). <b>Next Step:</b> This is a critical issue. Investigate your network topology for loops." }] },
-            ]
-        },
-        {
-            id: "symptom-performance",
-            title: "Symptom: Intermittent Connectivity / Slow Performance",
-            steps: [
-                { id: "perf-1", do: "Check for Interface Errors", how: { cisco_ios: "<code>show interface [name]</code>", juniper_junos: "<code>show interfaces [name] detail</code>", arista_eos: "<code>show interfaces [name]</code>" }, means: [{ cue: "🟢 (OK)", text: "Error counters are zero or low." }, { cue: "🔴 (Critical)", text: "Counters are high/increasing. <b>Next Step:</b> Replace the cable first. If that fails, check for a duplex mismatch." }] },
-                { id: "perf-2", do: "Verify Duplex Settings", how: { cisco_ios: "<code>show interface [name] | include duplex</code>", juniper_junos: "<code>show interfaces [name] | match Duplex</code>", arista_eos: "<code>show interfaces [name] | include Duplex</code>" }, means: [{ cue: "🟢 (OK)", text: "Duplex is 'full' and matches." }, { cue: "🔴 (Critical)", text: "Duplex is 'half' or mismatched. <b>Next Step:</b> Set both ends to `auto` or hard-code them to `full`." }] },
-                { id: "perf-3", do: "Monitor CPU Utilization", how: { cisco_ios: "<code>show processes cpu sorted</code>", juniper_junos: "<code>show system processes extensive</code>", arista_eos: "<code>show processes top</code>" }, means: [{ cue: "🟢 (OK)", text: "CPU is below 70%." }, { cue: "🟡 (Investigate)", text: "CPU is consistently high (>80%). <b>Next Step:</b> Identify the top process to find the cause (e.g., broadcast storm)." }] }
-            ]
-        },
-        {
-            id: "symptom-poe",
-            title: "Symptom: PoE Device Not Powering On",
-            steps: [
-                { id: "poe-1", do: "Verify PoE Status on Port", how: { cisco_ios: "<code>show power inline [interface]</code>", juniper_junos: "<code>show poe interface [interface]</code>", arista_eos: "<code>show poe interface [interface]</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Status 'delivering power':</b> Issue is likely cable or device." }, { cue: "🟡 (Investigate)", text: "<b>Status 'denied' or 'faulty':</b> Switch is not providing power. Continue." }] },
-                { id: "poe-2", do: "Check PoE Budget", how: { cisco_ios: "<code>show power inline</code>", juniper_junos: "<code>show poe controller</code>", arista_eos: "<code>show poe</code>" }, means: [{ cue: "🟢 (OK)", text: "Available power is sufficient." }, { cue: "🔴 (Critical)", text: "Available power is near zero. No more power to allocate." }] },
-                { id: "poe-3", do: "Test with Known-Good Items", how: { generic: "Swap port, cable, and device one by one." }, means: [{ cue: " ", text: "This is the fastest way to isolate the fault to a specific component." }] }
-            ]
-        },
-        {
-            id: "symptom-unresponsive",
-            title: "Symptom: Switch is Unresponsive (No Console/SSH)",
-            steps: [
-                { id: "unresp-1", do: "Verify Physical Access", how: { generic: "Check console cable is secure. Test adapter." }, means: [{ cue: " ", text: "Confirms your access equipment is working." }] },
-                { id: "unresp-2", do: "Perform a Power Cycle", how: { generic: "Disconnect power, wait 30s, reconnect." }, means: [{ cue: "🟡 (Investigate)", text: "<b>Warning:</b> This causes an outage for connected devices." }] },
-                { id: "unresp-3", do: "Observe Boot Sequence", how: { generic: "Watch console output during power cycle." }, means: [{ cue: "🟢 (OK)", text: "You see boot messages. Look for errors." }, { cue: "🔴 (Critical)", text: "Still no output. Likely a hardware failure." }] }
-            ]
+    
+    <script>
+        // --- DATA ---
+const symptoms = [
+    {
+        id: "symptom-gibberish",
+        title: "Symptom: Gibberish or Garbled Console Output",
+        steps: [
+            { id: "gibberish-1", do: "Identify the Symptom", how: { generic: "You see random characters like `▒▒▒`." }, means: [{ cue: "🔴 (Critical)", text: "This is a classic baud rate mismatch." }] },
+            { id: "gibberish-2", do: "Change the Baud Rate", how: { generic: "In your terminal, change 'Speed (baud)' to <b>9600</b>, then <b>115200</b>." }, means: [{ cue: " ", text: "Cycle through rates in Appendix B." }] },
+            { id: "gibberish-3", do: "Verify Other Serial Settings", how: { generic: "Confirm: Data bits: 8, Stop bits: 1, Parity: None." }, means: [{ cue: " ", text: "Incorrect settings can also cause issues." }] }
+        ]
+    },
+    {
+        id: "symptom-single-user",
+        title: "Symptom: No Connectivity (Single User/Device)",
+        steps: [
+            { id: "single-1", do: "Check Physical Layer", how: { generic: "Visually inspect cable and link lights." }, means: [{ cue: "🟢 (OK)", text: "<b>Solid Green Light:</b> Link is up." }, { cue: "🔴 (Critical)", text: "<b>No Light/Amber Light:</b> Link is down. <b>Next Step:</b> Try a different port and a known-good cable." }] },
+            { id: "single-2", do: "Verify Port Status", how: { cisco_ios: "<code>show interfaces status | include [port]</code>", juniper_junos: "<code>show interfaces [port] terse</code>", arista_eos: "<code>show interface status</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Status 'connected':</b> Port is active." }, { cue: "🟡 (Investigate)", text: "<b>Status 'err-disabled':</b> Port was shut down by a security feature. <b>Next Step:</b> Investigate the cause using `show port-security`." }] },
+            { id: "single-3", do: "Check VLAN Assignment", how: { cisco_ios: "<code>show vlan brief | include [port]</code>", juniper_junos: "<code>show vlans | match [port]</code>", arista_eos: "<code>show vlan | include [port]</code>" }, means: [{ cue: "🟢 (OK)", text: "Port is in the correct VLAN." }, { cue: "🔴 (Critical)", text: "Port is in the wrong VLAN. <b>Next Step:</b> Move the port to the correct VLAN." }] },
+        ]
+    },
+    {
+        id: "symptom-subnet",
+        title: "Symptom: No Connectivity (Entire Subnet/VLAN)",
+        steps: [
+            { id: "subnet-1", do: "Check the Gateway/SVI", how: { cisco_ios: "<code>show ip interface brief</code>", juniper_junos: "<code>show interfaces terse | match vlan</code>", arista_eos: "<code>show ip interface brief</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Interface is 'up/up':</b> Gateway is active." }, { cue: "🟡 (Investigate)", text: "<b>Interface is 'down' or 'admin down':</b> The VLAN interface is disabled or has no active ports in it." }] },
+            { id: "subnet-2", do: "Verify Uplink/Trunk Status", how: { cisco_ios: "<code>show interface trunk</code>", juniper_junos: "<code>show interfaces trunk</code>", arista_eos: "<code>show interfaces trunk</code>" }, means: [{ cue: "🟢 (OK)", text: "Trunk is up and the VLAN is allowed." }, { cue: "🔴 (Critical)", text: "VLAN is not in the 'allowed' list. <b>Next Step:</b> Add the VLAN to the trunk's allowed list on both ends." }] },
+            { id: "subnet-3", do: "Check Spanning Tree (STP)", how: { cisco_ios: "<code>show spanning-tree vlan [id]</code>", juniper_junos: "<code>show spanning-tree bridge</code>", arista_eos: "<code>show spanning-tree vlan [id]</code>" }, means: [{ cue: "🟢 (OK)", text: "Port is 'Forwarding' (FWD)." }, { cue: "🔴 (Critical)", text: "Port is 'Blocking' (BLK). <b>Next Step:</b> This is a critical issue. Investigate your network topology for loops." }] },
+        ]
+    },
+    {
+        id: "symptom-performance",
+        title: "Symptom: Intermittent Connectivity / Slow Performance",
+        steps: [
+            { id: "perf-1", do: "Check for Interface Errors", how: { cisco_ios: "<code>show interface [name]</code>", juniper_junos: "<code>show interfaces [name] detail</code>", arista_eos: "<code>show interfaces [name]</code>" }, means: [{ cue: "🟢 (OK)", text: "Error counters are zero or low." }, { cue: "🔴 (Critical)", text: "Counters are high/increasing. <b>Next Step:</b> Replace the cable first. If that fails, check for a duplex mismatch." }] },
+            { id: "perf-2", do: "Verify Duplex Settings", how: { cisco_ios: "<code>show interface [name] | include duplex</code>", juniper_junos: "<code>show interfaces [name] | match Duplex</code>", arista_eos: "<code>show interfaces [name] | include Duplex</code>" }, means: [{ cue: "🟢 (OK)", text: "Duplex is 'full' and matches." }, { cue: "🔴 (Critical)", text: "Duplex is 'half' or mismatched. <b>Next Step:</b> Set both ends to `auto` or hard-code them to `full`." }] },
+            { id: "perf-3", do: "Monitor CPU Utilization", how: { cisco_ios: "<code>show processes cpu sorted</code>", juniper_junos: "<code>show system processes extensive</code>", arista_eos: "<code>show processes top</code>" }, means: [{ cue: "🟢 (OK)", text: "CPU is below 70%." }, { cue: "🟡 (Investigate)", text: "CPU is consistently high (>80%). <b>Next Step:</b> Identify the top process to find the cause (e.g., broadcast storm)." }] }
+        ]
+    },
+    {
+        id: "symptom-poe",
+        title: "Symptom: PoE Device Not Powering On",
+        steps: [
+            { id: "poe-1", do: "Verify PoE Status on Port", how: { cisco_ios: "<code>show power inline [interface]</code>", juniper_junos: "<code>show poe interface [interface]</code>", arista_eos: "<code>show poe interface [interface]</code>" }, means: [{ cue: "🟢 (OK)", text: "<b>Status 'delivering power':</b> Issue is likely cable or device." }, { cue: "🟡 (Investigate)", text: "<b>Status 'denied' or 'faulty':</b> Switch is not providing power. Continue." }] },
+            { id: "poe-2", do: "Check PoE Budget", how: { cisco_ios: "<code>show power inline</code>", juniper_junos: "<code>show poe controller</code>", arista_eos: "<code>show poe</code>" }, means: [{ cue: "🟢 (OK)", text: "Available power is sufficient." }, { cue: "🔴 (Critical)", text: "Available power is near zero. No more power to allocate." }] },
+            { id: "poe-3", do: "Test with Known-Good Items", how: { generic: "Swap port, cable, and device one by one." }, means: [{ cue: " ", text: "This is the fastest way to isolate the fault to a specific component." }] }
+        ]
+    },
+    {
+        id: "symptom-unresponsive",
+        title: "Symptom: Switch is Unresponsive (No Console/SSH)",
+        steps: [
+            { id: "unresp-1", do: "Verify Physical Access", how: { generic: "Check console cable is secure. Test adapter." }, means: [{ cue: " ", text: "Confirms your access equipment is working." }] },
+            { id: "unresp-2", do: "Perform a Power Cycle", how: { generic: "Disconnect power, wait 30s, reconnect." }, means: [{ cue: "🟡 (Investigate)", text: "<b>Warning:</b> This causes an outage for connected devices." }] },
+            { id: "unresp-3", do: "Observe Boot Sequence", how: { generic: "Watch console output during power cycle." }, means: [{ cue: "🟢 (OK)", text: "You see boot messages. Look for errors." }, { cue: "🔴 (Critical)", text: "Still no output. Likely a hardware failure." }] }
+        ]
+    }
+];
+
+const baudRates = [
+    { rate: '9600', use: '<b>Default console rate. START HERE. (Common for Cisco)</b>' }, 
+    { rate: '115200', use: '<b>Modern console high speed. TRY THIS SECOND. (Common for Juniper, Arista)</b>' }, 
+    { rate: '19200', use: 'Faster console' }, 
+    { rate: '38400', use: 'Fast console or modem' }, 
+    { rate: '57600', use: 'High speed serial' }, 
+    { rate: '4800', use: 'Older terminals' }, 
+    { rate: '2400', use: 'Legacy serial' }, 
+    { rate: '1200', use: 'Early serial comms' }
+]; 
+
+const regexes = [
+    { goal: "Find a MAC Address", pattern: "<code>([0-9a-fA-F]{4}\\.){2}[0-9a-fA-F]{4}</code>", example: "<code>show mac address-table | include ([0-9a-fA-F]{4}\\.){2}[0-9a-fA-F]{4}</code>" },
+    { goal: "Find an IP Address", pattern: "<code>([0-9]{1,3}\\.){3}[0-9a-1,3}</code>", example: "<code>show ip arp | include ([0-9]{1,3}\\.){3}[0-9]{1,3}</code>" },
+    { goal: "Filter for 'up/up' Interfaces", pattern: "<code>up\\s+up</code>", example: "<code>show ip interface brief | include up\\s+up</code>" },
+    { goal: "Filter for 'err-disabled'", pattern: "<code>err-disabled</code>", example: "<code>show interface status | include err-disabled</code>" }
+];
+
+// --- XLSX File Handling Globals (from original file) ---
+var gk_isXlsx = false;
+var gk_xlsxFileLookup = {};
+var gk_fileData = {};
+
+    </script>
+    <script>
+        // --- XLSX File Handling (from original file) ---
+function filledCell(cell) {
+  return cell !== '' && cell != null;
+}
+function loadFileData(filename) {
+if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+    try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' })
+        var filteredData = jsonData.filter(row => row.some(filledCell));
+
+        var headerRowIndex = filteredData.findIndex((row, index) =>
+          row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+        );
+      
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
         }
-    ];
-    // --- CORE LOGIC ---
-    document.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
-        buildSymptoms();
-        buildBaudTable();
-        buildRegexTable();
-        loadState();
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); 
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+    } catch (e) {
+        console.error(e);
+        return "";
+    }
+}
+return gk_fileData[filename] || "";
+}
+
+// --- CORE PLAYBOOK LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
+    buildSymptoms();
+    buildBaudTable();
+    buildRegexTable();
+    loadState();
+});
+function buildSymptoms() {
+    const container = document.getElementById('symptoms-container');
+    container.innerHTML = '';
+    symptoms.forEach(symptom => {
+        const details = document.createElement('details');
+        details.className = 'troubleshooting-section';
+        details.id = symptom.id;
+        const summary = document.createElement('summary');
+        summary.textContent = symptom.title;
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700';
+        const table = document.createElement('table');
+        table.className = 'w-full text-sm text-left';
+        table.innerHTML = `<thead><tr><th class="p-2 w-1/12"></th><th class="p-2 w-3/12">What to Do</th><th class="p-2 w-4/12">How to Do It</th><th class="p-2 w-4/12">What It Means</th></tr></thead>`;
+        const tbody = document.createElement('tbody');
+        symptom.steps.forEach(step => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b dark:border-gray-700';
+            let meansHTML = step.means.map(mean => `<div class="cue"><span class="cue-icon">${mean.cue}</span><span>${mean.text}</span></div>`).join('');
+            let howHTML = buildHowToCell(step.how, step.id);
+            tr.innerHTML = `<td class="p-2 align-top"><input type="checkbox" id="${step.id}" onchange="saveState(this)" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"></td><td class="p-2 align-top">${step.do}</td><td class="p-2 align-top">${howHTML}</td><td class="p-2 align-top">${meansHTML}</td>`;
+            tbody.appendChild(tr);
+        });
+        const notesHTML = `<div class="mt-4"><label for="notes-${symptom.id}" class="block text-sm font-medium mb-1">Troubleshooting Notes:</label><textarea id="notes-${symptom.id}" onkeyup="saveState(this)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Log your findings here..."></textarea></div>`;
+        table.appendChild(tbody);
+        contentDiv.appendChild(table);
+        contentDiv.insertAdjacentHTML('beforeend', notesHTML);
+        details.appendChild(summary);
+        details.appendChild(contentDiv);
+        container.appendChild(details);
     });
-    function buildSymptoms() {
-        const container = document.getElementById('symptoms-container');
-        container.innerHTML = '';
-        symptoms.forEach(symptom => {
-            const details = document.createElement('details');
-            details.className = 'troubleshooting-section';
-            details.id = symptom.id;
-            const summary = document.createElement('summary');
-            summary.textContent = symptom.title;
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700';
-            const table = document.createElement('table');
-            table.className = 'w-full text-sm text-left';
-            table.innerHTML = `<thead><tr><th class="p-2 w-1/12"></th><th class="p-2 w-3/12">What to Do</th><th class="p-2 w-4/12">How to Do It</th><th class="p-2 w-4/12">What It Means</th></tr></thead>`;
-            const tbody = document.createElement('tbody');
-            symptom.steps.forEach(step => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b dark:border-gray-700';
-                let meansHTML = step.means.map(mean => `<div class="cue"><span class="cue-icon">${mean.cue}</span><span>${mean.text}</span></div>`).join('');
-                let howHTML = buildHowToCell(step.how, step.id);
-                tr.innerHTML = `<td class="p-2 align-top"><input type="checkbox" id="${step.id}" onchange="saveState(this)" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"></td><td class="p-2 align-top">${step.do}</td><td class="p-2 align-top">${howHTML}</td><td class="p-2 align-top">${meansHTML}</td>`;
-                tbody.appendChild(tr);
-            });
-            const notesHTML = `<div class="mt-4"><label for="notes-${symptom.id}" class="block text-sm font-medium mb-1">Troubleshooting Notes:</label><textarea id="notes-${symptom.id}" onkeyup="saveState(this)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Log your findings here..."></textarea></div>`;
-            table.appendChild(tbody);
-            contentDiv.appendChild(table);
-            contentDiv.insertAdjacentHTML('beforeend', notesHTML);
-            details.appendChild(summary);
-            details.appendChild(contentDiv);
-            container.appendChild(details);
+}
+function buildHowToCell(how, stepId) {
+    if (how.generic) return how.generic;
+    const vendors = ['cisco_ios', 'juniper_junos', 'arista_eos'];
+    const tabs = vendors.map((v, i) => `<button class="vendor-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(event, '${stepId}', '${v}')" aria-label="Show commands for ${v.replace(/_/g, ' ').toUpperCase()}">${v.replace(/_/g, ' ').toUpperCase()}</button>`).join('');
+    const content = vendors.map((v, i) => `<div id="${stepId}-${v}" class="vendor-content mt-2 ${i === 0 ? 'active' : ''}">${how[v]}<button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling, this)">Copy</button><span class="copied-feedback"></span></div>`).join('');
+    return `<div class="flex space-x-1">${tabs}</div>${content}`;
+}
+function switchTab(event, stepId, vendor) {
+    const parent = event.target.closest('.p-2');
+    parent.querySelectorAll('.vendor-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    parent.querySelectorAll('.vendor-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`${stepId}-${vendor}`).classList.add('active');
+    localStorage.setItem(`vendor-tab-${stepId}`, vendor);
+}
+function saveState(element) {
+    const state = JSON.parse(localStorage.getItem('playbookState')) || {};
+    state[element.id] = element.type === 'checkbox' ? element.checked : element.value;
+    localStorage.setItem('playbookState', JSON.stringify(state));
+}
+function loadState() {
+    const state = JSON.parse(localStorage.getItem('playbookState')) || {};
+    Object.keys(state).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            if (element.type === 'checkbox') element.checked = state[id];
+            else if (element.type === 'textarea') element.value = state[id];
+        }
+    });
+    symptoms.forEach(symptom => {
+        symptom.steps.forEach(step => {
+            const vendor = localStorage.getItem(`vendor-tab-${step.id}`) || 'cisco_ios';
+            const tabButton = document.querySelector(`button.vendor-tab[onclick*="switchTab(event, '${step.id}', '${vendor}'"]`);
+            if (tabButton) tabButton.click();
         });
-    }
-    function buildHowToCell(how, stepId) {
-        if (how.generic) return how.generic;
-        const vendors = ['cisco_ios', 'juniper_junos', 'arista_eos'];
-        const tabs = vendors.map((v, i) => `<button class="vendor-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(event, '${stepId}', '${v}')" aria-label="Show commands for ${v.replace(/_/g, ' ').toUpperCase()}">${v.replace(/_/g, ' ').toUpperCase()}</button>`).join('');
-        const content = vendors.map((v, i) => `<div id="${stepId}-${v}" class="vendor-content mt-2 ${i === 0 ? 'active' : ''}">${how[v]}<button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling, this)">Copy</button><span class="copied-feedback"></span></div>`).join('');
-        return `<div class="flex space-x-1">${tabs}</div>${content}`;
-    }
-    function switchTab(event, stepId, vendor) {
-        const parent = event.target.closest('.p-2');
-        parent.querySelectorAll('.vendor-tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        parent.querySelectorAll('.vendor-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(`${stepId}-${vendor}`).classList.add('active');
-        localStorage.setItem(`vendor-tab-${stepId}`, vendor);
-    }
-    function saveState(element) {
-        const state = JSON.parse(localStorage.getItem('playbookState')) || {};
-        state[element.id] = element.type === 'checkbox' ? element.checked : element.value;
-        localStorage.setItem('playbookState', JSON.stringify(state));
-    }
-    function loadState() {
-        const state = JSON.parse(localStorage.getItem('playbookState')) || {};
-        Object.keys(state).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                if (element.type === 'checkbox') element.checked = state[id];
-                else if (element.type === 'textarea') element.value = state[id];
-            }
-        });
-        symptoms.forEach(symptom => {
-            symptom.steps.forEach(step => {
-                const vendor = localStorage.getItem(`vendor-tab-${step.id}`) || 'cisco_ios';
-                const tabButton = document.querySelector(`button.vendor-tab[onclick*="switchTab(event, '${step.id}', '${vendor}'"]`);
-                if (tabButton) tabButton.click();
-            });
-        });
-    }
-    function generateReport() {
-        const state = JSON.parse(localStorage.getItem('playbookState')) || {};
-        let report = `OpenSwitch Playbook Troubleshooting Report\nGenerated: ${new Date().toLocaleString()}\n\n`;
-        symptoms.forEach(symptom => {
-            report += `${symptom.title}\n${'='.repeat(symptom.title.length)}\nChecked Steps:\n`;
-            const checkedSteps = Array.from(document.querySelectorAll(`#${symptom.id} input[type="checkbox"]:checked`));
-            report += checkedSteps.length > 0 ? checkedSteps.map(step => `- ${step.closest('tr').querySelector('td:nth-child(2)').textContent}`).join('\n') + '\n' : "- No steps completed.\n";
-            report += `\nNotes:\n${state[`notes-${symptom.id}`] || "No notes taken."}\n\n`;
-        });
-        return report;
-    }
-    function showExportModal() {
-        const report = generateReport();
-        document.getElementById('export-content').textContent = report;
-        document.getElementById('export-modal').classList.remove('hidden');
-    }
-    function hideExportModal() { document.getElementById('export-modal').classList.add('hidden'); }
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-    function copyToClipboard(element, button) {
-        const textToCopy = element.textContent;
-        const feedback = button.nextElementSibling;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                button.textContent = 'Copied!';
-                feedback.style.opacity = '1';
-                showToast('Command copied to clipboard!');
-                setTimeout(() => {
-                    button.textContent = 'Copy';
-                    feedback.style.opacity = '0';
-                }, 2000);
-            }).catch(err => {
-                try {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = textToCopy;
-                    textarea.style.position = 'fixed';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    button.textContent = 'Copied!';
-                    feedback.style.opacity = '1';
-                    showToast('Command copied to clipboard!');
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                        feedback.style.opacity = '0';
-                    }, 2000);
-                } catch (fallbackErr) {
-                    alert('Failed to copy text to clipboard. Please copy manually.');
-                    console.error('Clipboard copy failed:', err, fallbackErr);
-                }
-            });
-        } else {
+    });
+}
+function generateReport() {
+    const state = JSON.parse(localStorage.getItem('playbookState')) || {};
+    let report = `OpenSwitch Playbook Troubleshooting Report\nGenerated: ${new Date().toLocaleString()}\n\n`;
+    symptoms.forEach(symptom => {
+        report += `${symptom.title}\n${'='.repeat(symptom.title.length)}\nChecked Steps:\n`;
+        const checkedSteps = Array.from(document.querySelectorAll(`#${symptom.id} input[type="checkbox"]:checked`));
+        report += checkedSteps.length > 0 ? checkedSteps.map(step => `- ${step.closest('tr').querySelector('td:nth-child(2)').textContent}`).join('\n') + '\n' : "- No steps completed.\n";
+        report += `\nNotes:\n${state[`notes-${symptom.id}`] || "No notes taken."}\n\n`;
+    });
+    return report;
+}
+function showExportModal() {
+    const report = generateReport();
+    document.getElementById('export-content').textContent = report;
+    document.getElementById('export-modal').classList.remove('hidden');
+}
+function hideExportModal() { document.getElementById('export-modal').classList.add('hidden'); }
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+function copyToClipboard(element, button) {
+    const textToCopy = element.textContent;
+    const feedback = button.nextElementSibling;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            button.textContent = 'Copied!';
+            feedback.style.opacity = '1';
+            showToast('Command copied to clipboard!');
+            setTimeout(() => {
+                button.textContent = 'Copy';
+                feedback.style.opacity = '0';
+            }, 2000);
+        }).catch(err => {
             try {
                 const textarea = document.createElement('textarea');
                 textarea.value = textToCopy;
@@ -507,33 +507,39 @@
                     button.textContent = 'Copy';
                     feedback.style.opacity = '0';
                 }, 2000);
-            } catch (err) {
+            } catch (fallbackErr) {
                 alert('Failed to copy text to clipboard. Please copy manually.');
-                console.error('Clipboard copy failed:', err);
+                console.error('Clipboard copy failed:', err, fallbackErr);
             }
+        });
+    } else {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            button.textContent = 'Copied!';
+            feedback.style.opacity = '1';
+            showToast('Command copied to clipboard!');
+            setTimeout(() => {
+                button.textContent = 'Copy';
+                feedback.style.opacity = '0';
+            }, 2000);
+        } catch (err) {
+            alert('Failed to copy text to clipboard. Please copy manually.');
+            console.error('Clipboard copy failed:', err);
         }
     }
-    function copyExportContent() {
-        const text = generateReport();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Report copied to clipboard!');
-            }).catch(err => {
-                try {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = text;
-                    textarea.style.position = 'fixed';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    showToast('Report copied to clipboard!');
-                } catch (fallbackErr) {
-                    alert('Failed to copy report to clipboard. Please copy manually from the modal.');
-                    console.error('Clipboard copy failed:', err, fallbackErr);
-                }
-            });
-        } else {
+}
+function copyExportContent() {
+    const text = generateReport();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Report copied to clipboard!');
+        }).catch(err => {
             try {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
@@ -543,92 +549,94 @@
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
                 showToast('Report copied to clipboard!');
-            } catch (err) {
+            } catch (fallbackErr) {
                 alert('Failed to copy report to clipboard. Please copy manually from the modal.');
-                console.error('Clipboard copy failed:', err);
+                console.error('Clipboard copy failed:', err, fallbackErr);
             }
+        });
+    } else {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Report copied to clipboard!');
+        } catch (err) {
+            alert('Failed to copy report to clipboard. Please copy manually from the modal.');
+            console.error('Clipboard copy failed:', err);
         }
     }
-    function downloadTxt() {
-        const text = generateReport();
-        const blob = new Blob([text], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Troubleshooting_Report_${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('Report downloaded as TXT!');
-    }
-    function printPdf() {
-        const state = JSON.parse(localStorage.getItem('playbookState')) || {};
-        const printDiv = document.getElementById('print-report');
-        printDiv.innerHTML = '';
-        let reportHTML = `<h1>OpenSwitch Playbook Troubleshooting Report</h1><p>Generated: ${new Date().toLocaleString()}</p>`;
-        symptoms.forEach(symptom => {
-            reportHTML += `<div class="print-section"><h3>${symptom.title}</h3><h4>Checked Steps:</h4>`;
-            const checkedSteps = Array.from(document.querySelectorAll(`#${symptom.id} input[type="checkbox"]:checked`));
-            reportHTML += checkedSteps.length > 0 ? `<ul>${checkedSteps.map(step => `<li>${step.closest('tr').querySelector('td:nth-child(2)').textContent}</li>`).join('')}</ul>` : '<p>No steps completed.</p>';
-            reportHTML += `<h4>Notes:</h4><p>${state[`notes-${symptom.id}`] || "No notes taken."}</p></div>`;
-        });
-        printDiv.innerHTML = reportHTML;
-        window.print();
-    }
-    function buildBaudTable() { 
-        const baudRates = [
-            { rate: '9600', use: '<b>Default console rate. START HERE. (Common for Cisco)</b>' }, 
-            { rate: '115200', use: '<b>Modern console high speed. TRY THIS SECOND. (Common for Juniper, Arista)</b>' }, 
-            { rate: '19200', use: 'Faster console' }, 
-            { rate: '38400', use: 'Fast console or modem' }, 
-            { rate: '57600', use: 'High speed serial' }, 
-            { rate: '4800', use: 'Older terminals' }, 
-            { rate: '2400', use: 'Legacy serial' }, 
-            { rate: '1200', use: 'Early serial comms' }
-        ]; 
-        const container = document.getElementById('baud-rate-table-container'); 
-        const table = document.createElement('table'); 
-        table.className = 'w-full text-sm'; 
-        table.innerHTML = `<thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">Baud Rate (bps)</th><th class="p-2 text-left">Common Use</th></tr></thead>`; 
-        const tbody = document.createElement('tbody'); 
-        baudRates.forEach(item => { 
-            tbody.innerHTML += `<tr><td class="p-2">${item.rate}</td><td class="p-2">${item.use}</td></tr>`; 
-        }); 
-        table.appendChild(tbody); 
-        container.appendChild(table); 
-    }
-    function buildRegexTable() {
-        const regexes = [
-            { goal: "Find a MAC Address", pattern: "<code>([0-9a-fA-F]{4}\\.){2}[0-9a-fA-F]{4}</code>", example: "<code>show mac address-table | include ([0-9a-fA-F]{4}\\.){2}[0-9a-fA-F]{4}</code>" },
-            { goal: "Find an IP Address", pattern: "<code>([0-9]{1,3}\\.){3}[0-9a-1,3}</code>", example: "<code>show ip arp | include ([0-9]{1,3}\\.){3}[0-9]{1,3}</code>" },
-            { goal: "Filter for 'up/up' Interfaces", pattern: "<code>up\\s+up</code>", example: "<code>show ip interface brief | include up\\s+up</code>" },
-            { goal: "Filter for 'err-disabled'", pattern: "<code>err-disabled</code>", example: "<code>show interface status | include err-disabled</code>" }
-        ];
-        const container = document.getElementById('regex-table-container');
-        const table = document.createElement('table');
-        table.className = 'w-full text-sm';
-        table.innerHTML = `<thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">Goal</th><th class="p-2 text-left">Regex Pattern</th><th class="p-2 text-left">Example Usage (Cisco)</th></tr></thead>`;
-        const tbody = document.createElement('tbody');
-        regexes.forEach(item => {
-            tbody.innerHTML += `<tr><td class="p-2">${item.goal}</td><td class="p-2">${item.pattern}</td><td class="p-2">${item.example}</td></tr>`;
-        });
-        table.appendChild(tbody);
-        container.appendChild(table);
-    }
-    // --- UTILITY FUNCTIONS ---
-    function toggleTheme() { 
-        const html = document.documentElement; 
-        html.classList.toggle('dark'); 
-        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); 
-    }
-    function filterPlaybook() { 
-        const searchTerm = document.getElementById('search-input').value.toLowerCase(); 
-        document.querySelectorAll('.troubleshooting-section').forEach(section => { 
-            const content = section.textContent.toLowerCase(); 
-            section.style.display = content.includes(searchTerm) ? '' : 'none'; 
-        }); 
-    }
-</script>
+}
+function downloadTxt() {
+    const text = generateReport();
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Troubleshooting_Report_${new Date().toISOString().replace(/[:.]/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Report downloaded as TXT!');
+}
+function printPdf() {
+    const state = JSON.parse(localStorage.getItem('playbookState')) || {};
+    const printDiv = document.getElementById('print-report');
+    printDiv.innerHTML = '';
+    let reportHTML = `<h1>OpenSwitch Playbook Troubleshooting Report</h1><p>Generated: ${new Date().toLocaleString()}</p>`;
+    symptoms.forEach(symptom => {
+        reportHTML += `<div class="print-section"><h3>${symptom.title}</h3><h4>Checked Steps:</h4>`;
+        const checkedSteps = Array.from(document.querySelectorAll(`#${symptom.id} input[type="checkbox"]:checked`));
+        reportHTML += checkedSteps.length > 0 ? `<ul>${checkedSteps.map(step => `<li>${step.closest('tr').querySelector('td:nth-child(2)').textContent}</li>`).join('')}</ul>` : '<p>No steps completed.</p>';
+        reportHTML += `<h4>Notes:</h4><p>${state[`notes-${symptom.id}`] || "No notes taken."}</p></div>`;
+    });
+    printDiv.innerHTML = reportHTML;
+    window.print();
+}
+function buildBaudTable() { 
+    // Data is now in playbook-data.js
+    const container = document.getElementById('baud-rate-table-container'); 
+    const table = document.createElement('table'); 
+    table.className = 'w-full text-sm'; 
+    table.innerHTML = `<thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">Baud Rate (bps)</th><th class="p-2 text-left">Common Use</th></tr></thead>`; 
+    const tbody = document.createElement('tbody'); 
+    baudRates.forEach(item => { 
+        tbody.innerHTML += `<tr><td class="p-2">${item.rate}</td><td class="p-2">${item.use}</td></tr>`; 
+    }); 
+    table.appendChild(tbody); 
+    container.appendChild(table); 
+}
+function buildRegexTable() {
+    // Data is now in playbook-data.js
+    const container = document.getElementById('regex-table-container');
+    const table = document.createElement('table');
+    table.className = 'w-full text-sm';
+    table.innerHTML = `<thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">Goal</th><th class="p-2 text-left">Regex Pattern</th><th class="p-2 text-left">Example Usage (Cisco)</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    regexes.forEach(item => {
+        tbody.innerHTML += `<tr><td class="p-2">${item.goal}</td><td class="p-2">${item.pattern}</td><td class="p-2">${item.example}</td></tr>`;
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+}
+// --- UTILITY FUNCTIONS ---
+function toggleTheme() { 
+    const html = document.documentElement; 
+    html.classList.toggle('dark'); 
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); 
+}
+function filterPlaybook() { 
+    const searchTerm = document.getElementById('search-input').value.toLowerCase(); 
+    document.querySelectorAll('.troubleshooting-section').forEach(section => { 
+        const content = section.textContent.toLowerCase(); 
+        section.style.display = content.includes(searchTerm) ? '' : 'none'; 
+    }); 
+}
+
+    </script>
 </body>
 </html>
