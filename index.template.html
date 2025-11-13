@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSwitch Playbook v1.1</title>
+    <style>
+        /* {{PLACEHOLDER_CSS}} */
+    </style>
+</head>
+<body>
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold">OpenSwitch Playbook v1.1</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">A Symptom-Driven Guide for Network Engineers</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="showExportModal()" class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Export Session</button>
+                <button onclick="toggleTheme()" class="p-2 rounded-md bg-gray-200 dark:bg-gray-700">
+                    <svg id="theme-icon-light" class="h-6 w-6 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    <svg id="theme-icon-dark" class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </button>
+            </div>
+        </header>
+        <div class="mb-6">
+            <input type="text" id="search-input" onkeyup="filterPlaybook()" placeholder="Search symptoms or commands..." class="w-full p-2 border rounded-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Search symptoms or commands">
+        </div>
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <details class="troubleshooting-section"><summary>Golden Rules of Troubleshooting</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700"><ul class="list-disc list-inside space-y-2"><li><b>Check Physical Layer First</b></li><li><b>Make One Change at a Time</b></li><li><b>Document as You Go</b></li><li><b>Know Recent Changes</b></li></ul></div></details>
+            <details class="troubleshooting-section"><summary>Cue Legend</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700"><ul class="space-y-2"><li>🟢 <b>Green (OK/Proceed)</b></li><li>🟡 <b>Yellow (Investigate)</b></li><li>🔴 <b>Red (Critical/Action Required)</b></li></ul></div></details>
+        </div>
+        <details class="troubleshooting-section mb-4" open>
+            <summary>1. Immediate Triage: The First 5 Minutes</summary>
+            <div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700">
+                <div class="space-y-2">
+                    <div class="flowchart-step"><b>START:</b> Is there a problem? <span class="cue-green">🟢 (OK)</span></div>
+                    <div class="flowchart-arrow"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                    <div class="flowchart-step">Check Physical Layer (Power, Cables) <span class="cue-yellow">🟡 (Investigate)</span></div>
+                    <div class="flowchart-arrow"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                    <div class="flowchart-step">Check Link Lights <span class="cue-yellow">🟡 (Investigate: Solid Green OK, Amber/No Light Critical)</span></div>
+                    <div class="flowchart-arrow"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                    <div class="flowchart-step">Check Port & VLAN Status <span class="cue-yellow">🟡 (Investigate)</span></div>
+                    <div class="flowchart-arrow"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                    <div class="flowchart-step font-semibold text-blue-600 dark:text-blue-400">If still failing, use detailed checklists below. <span class="cue-red">🔴 (Critical)</span></div>
+                </div>
+            </div>
+        </details>
+        <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">2. Symptom-Based Troubleshooting</h2>
+        <div id="symptoms-container" class="space-y-4">
+            </div>
+        <h2 class="text-xl font-bold mt-8 mb-4 border-b pb-2 border-gray-300 dark:border-gray-700">3. Reference Materials</h2>
+        <div class="space-y-4">
+            <details class="troubleshooting-section"><summary>Appendix A: Recommended Tools</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700"><ul class="list-disc list-inside space-y-2"><li><b>Physical:</b> Cable tester, loopback plugs, console cable kit, spare patch cables, known-good PoE device.</li><li><b>Software:</b> PuTTY, TFTP server, Wireshark.</li></ul></div></deta<\ctrl63>
+            <details class="troubleshooting-section"><summary>Appendix B: Standard Baud Rates</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700" id="baud-rate-table-container"></div></details>
+            <details class="troubleshooting-section"><summary>Appendix C: Regex Cheatsheet</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700" id="regex-table-container"></div></details>
+            <details class="troubleshooting-section"><summary>Appendix D: Key Vendor-Neutral Commands</summary><div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b dark:border-gray-700">
+                            <th class="p-2 text-left">Command</th>
+                            <th class="p-2 text-left">Purpose</th>
+                            <th class="p-2 text-left">Key Indicators</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-2"><code>show interface status</code></td>
+                            <td class="p-2">Check port status and errors.</td>
+                            <td class="p-2">Look for "down" status or high error counts.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show vlan brief</code></td>
+                            <td class="p-2">Verify VLAN configurations.</td>
+                            <td class="p-2">Ensure correct VLAN assignment.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show interface trunk</code></td>
+                            <td class="p-2">Check trunk status.</td>
+                            <td class="p-2">Confirm allowed VLANs on trunk.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show spanning-tree</code></td>
+                            <td class="p-2">Inspect STP topology.</td>
+                            <td class="p-2">Check for root bridge issues or blocked ports.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show processes cpu</code></td>
+                            <td class="p-2">Monitor CPU usage.</td>
+                            <td class="p-2">High CPU usage may indicate loops or misconfigurations.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show port-security interface [name]</code></td>
+                            <td class="p-2">Check port security status.</td>
+                            <td class="p-2">Look for violations or restricted ports.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2"><code>show power inline</code></td>
+                            <td class="p-2">Verify PoE status.</td>
+                            <td class="p-2">Ensure power is allocated to devices.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div></details>
+        </div>
+        <details class="troubleshooting-section mt-8">
+            <summary>Version History</summary>
+            <div class="card troubleshooting-content p-4 border border-t-0 rounded-b-md border-gray-200 dark:border-gray-700">
+                <ul class="list-disc list-inside space-y-2">
+                    <li><b>v1.1 (August 16, 2025):</b> Initial release with basic triage and reference materials. Made offline-compatible, improved accessibility with ARIA labels and cue text, 
+                            enhanced export to all symptoms, persisted vendor tabs, added key indicators to commands, vendor notes to baud rates, flowchart labels.</li>
+                </ul>
+            </div>
+        </details>
+    </div>
+    <div id="export-modal" class="modal-overlay hidden">
+        <div class="modal-content card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">Troubleshooting Session Report</h3>
+                <button onclick="hideExportModal()" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200" aria-label="Close modal">&times;</button>
+            </div>
+            <pre id="export-content" class="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-800 dark:border-gray-600 whitespace-pre-wrap"></pre>
+            <div class="flex space-x-2 mt-4">
+                <button onclick="copyExportContent()" class="flex-1 px-3 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Copy to Clipboard</button>
+                <button onclick="downloadTxt()" class="flex-1 px-3 py-2 font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Download as TXT</button>
+                <button onclick="printPdf()" class="flex-1 px-3 py-2 font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700">Save as PDF</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast">Text copied to clipboard!</div>
+    <div id="print-report" class="hidden"></div>
+    
+    <script>
+        // {{PLACEHOLDER_DATA_JS}}
+    </script>
+    <script>
+        // {{PLACEHOLDER_APP_JS}}
+    </script>
+</body>
+</html>
